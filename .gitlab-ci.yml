@@ -1,0 +1,21 @@
+include:
+  - project: 'odeeo/ci-config'
+    ref: 'develop'
+    file:
+      - '.gitlab-ci.yml'
+
+stages:
+  - check-branch-name
+  - static-analysis
+  
+.base_template: &base_job_template
+  image: registry.gitlab.com/odeeo/docker-terraform-builder:v0.1.0
+  before_script:
+    - echo -e "machine gitlab.com\nlogin ${CUSTOM_CI_USERNAME}\npassword ${CUSTOM_CI_TOKEN}" > ~/.netrc
+    - git config --global url."https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/".insteadOf "https://gitlab.com/"
+
+code:
+  <<: *base_job_template
+  stage: static-analysis
+  script:
+    - make all
